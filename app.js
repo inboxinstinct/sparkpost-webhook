@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const ActiveCampaign = require('./models/ActiveCampaign');
+
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -45,6 +47,12 @@ app.post('/webhook', async (req, res) => {
       console.error('IGNORED: Received non-numeric campaignId:', campaignId);
       res.status(200).send('Webhook processed');
   }
+
+  await ActiveCampaign.findOneAndUpdate(
+    { campaignId: campaignId },
+    { $set: { lastUpdated: new Date() } },
+    { upsert: true, new: true }
+  );
   
       if (eventType === "delivery") {
         await Campaign.updateOne(
@@ -97,6 +105,35 @@ app.post('/webhook', async (req, res) => {
       res.status(500).send('Internal Server Error');
     }
 });
+
+
+const updateStatsAndCleanup = async () => {
+  const twoMinutesAgo = new Date(new Date().getTime() - 2 * 60000);
+  const activeCampaigns = await ActiveCampaign.find({ lastUpdated: { $gte: twoMinutesAgo } });
+
+  for (const activeCampaign of activeCampaigns) {
+    const campaign = await Campaign.findOne({ campaignId: activeCampaign.campaignId });
+    if (campaign) {
+      // Recalculate stats
+      const stats = {
+        opens: campaign.openers.length,
+        clicks: campaign.clickers.length,
+        bounces: campaign.bouncers.length,
+        successfulDeliveries: campaign.delivered.length,
+        unsubscribes: campaign.unsubscribed.length,
+        spamComplaints: campaign.complaints.length,
+      };
+      await Campaign.updateOne({ campaignId: campaign.campaignId }, { $set: { stats: stats } });
+    }
+  }
+
+  // Remove inactive campaigns
+  await ActiveCampaign.deleteMany({ lastUpdated: { $lt: twoMinutesAgo } });
+};
+
+// Run the task every 90 seconds
+setInterval(updateStatsAndCleanup, 90000);
+
   
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

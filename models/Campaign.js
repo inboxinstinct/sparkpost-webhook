@@ -23,6 +23,8 @@ const campaignSchema = new mongoose.Schema({
     clicks: Number,
     bounces: Number,
     successfulDeliveries: Number,
+    unsubscribes: Number,
+    spamComplaints: Number,
   },
   openers: [{ type: String, default: [] }],
   clickers: [{ type: String, default: [] }], 
