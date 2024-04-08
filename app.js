@@ -38,6 +38,12 @@ app.post('/webhook', async (req, res) => {
       const campaignId = eventData.campaign_id;
       const email = eventData.rcpt_to;
       const eventType = eventData.type;
+
+          // Check if campaignId is numeric
+    if (isNaN(Number(campaignId))) {
+      // Handle non-numeric campaignId (log, ignore, or process differently)
+      console.error('IGNORED: Received non-numeric campaignId:', campaignId);
+  }
   
       if (eventType === "delivery") {
         await Campaign.updateOne(
