@@ -43,6 +43,7 @@ app.post('/webhook', async (req, res) => {
     if (isNaN(Number(campaignId))) {
       // Handle non-numeric campaignId (log, ignore, or process differently)
       console.error('IGNORED: Received non-numeric campaignId:', campaignId);
+      res.status(200).send('Webhook processed');
   }
   
       if (eventType === "delivery") {
