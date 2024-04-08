@@ -1,6 +1,17 @@
 // models/Campaign.js
 const mongoose = require('mongoose');
 
+/*const bouncerSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    default: []
+  },
+  bounceCode: {
+    type: String,
+    default: []
+  }
+});*/
+
 const campaignSchema = new mongoose.Schema({
   campaignId: { type: Number, required: true, unique: true },
   subject: { type: String, required: true },
@@ -13,9 +24,15 @@ const campaignSchema = new mongoose.Schema({
     bounces: Number,
     successfulDeliveries: Number,
   },
-  openers: [{ type: String, default: [] }], // List of email addresses
-  clickers: [{ type: String, default: [] }], // List of email addresses
-  bouncers: [{ type: String, default: [] }], // List of email addresses
+  openers: [{ type: String, default: [] }],
+  clickers: [{ type: String, default: [] }], 
+  bouncers: [{
+    email: String, default: [],
+    bounceCode: String, default: []
+  }], 
+  delivered: [{ type: String, default: [] }],
+  unsubscribed: [{ type: String, default: [] }],
+  complaints: [{ type: String, default: [] }],
   createdAt: { type: Date, default: Date.now },
 });
 
