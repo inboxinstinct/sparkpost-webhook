@@ -24,11 +24,15 @@ const WebhookEvent = require('./models/WebhookEvent');
 
 app.post('/webhook', async (req, res) => {
   try {
-    const webhookData = req.body[0];
+    // Assuming req.body is an array of webhook events
+    const webhookEvents = req.body;
     
-    await WebhookEvent.create({
-      eventData: webhookData
-    });
+    // Process all webhook events in parallel
+    await Promise.all(webhookEvents.map(async (webhookData) => {
+      return WebhookEvent.create({
+        eventData: webhookData
+      });
+    }));
 
     res.status(200).send('Webhook received');
   } catch (error) {
