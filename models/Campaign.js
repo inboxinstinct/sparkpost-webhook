@@ -19,6 +19,9 @@ const campaignSchema = new mongoose.Schema({
   fromEmail: { type: String, required: true },
   htmlContent: { type: String, required: true },
   scheduledAt: { type: Date, required: false },
+  templateId: { type: String, required: false },
+  recipientListId: { type: String, required: false },
+  isScheduleSent: { type: Date, required: false },
   stats: {
     opens: Number,
     clicks: Number,
