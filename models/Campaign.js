@@ -25,7 +25,7 @@ const campaignSchema = new mongoose.Schema({
   tempo: { type: Boolean, required: false },
   tempoRate: { type: Number, required: false },
   tempoProgress: { type: Number, required: false },
-  inProgress: { type: Boolean, required: false, },
+  inProgress: { type: Boolean, required: false },
   stats: {
     opens: Number,
     clicks: Number,
